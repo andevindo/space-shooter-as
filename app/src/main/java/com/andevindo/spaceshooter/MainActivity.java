@@ -21,15 +21,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Membuat tampilan menjadi full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        //Membuat tampilan selalu menyala jika activity aktif
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        //Mendapatkan ukuran layar
         Display display = getWindowManager().getDefaultDisplay();
         Point point = new Point();
         display.getSize(point);
         Log.d("X and Y size", "X = " + point.x + ", Y = " + point.y);
+
         mGameView = new GameView(this, point.x, point.y);
         setContentView(mGameView);
 
+        //Sensor Accelerometer digunakan untuk menggerakan player ke kanan dan ke kiri
         SensorManager manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor accelerometer = manager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
         manager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
@@ -49,8 +56,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        float xChange = mXTemp - event.values[0];
-        //Log.d("Sensor", mXTemp + ", " + event.values[0]);
         mXTemp = event.values[0];
 
         if (event.values[0] > 1){
