@@ -7,6 +7,7 @@ import android.graphics.Rect;
 
 import java.util.Random;
 
+import static com.andevindo.spaceshooter.GameView.ENEMY_DESTROYED;
 import static com.andevindo.spaceshooter.GameView.SCORE;
 
 /**
@@ -89,6 +90,7 @@ public class Enemy {
     public void hit(){
         if (--mHP ==0){
             SCORE += 50;
+            ENEMY_DESTROYED++;
             destroy();
         }else{
             mSoundPlayer.playExplode();

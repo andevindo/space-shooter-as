@@ -1,6 +1,8 @@
 package com.andevindo.spaceshooter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -37,7 +39,10 @@ public class GameView extends SurfaceView implements Runnable {
     private SoundPlayer mSoundPlayer;
     private SharedPreferencesManager mSP;
     public static int SCORE = 0;
+    public static int METEOR_DESTROYED = 0;
+    public static int ENEMY_DESTROYED = 0;
     private volatile boolean mIsGameOver;
+    private volatile boolean mNewHighScore;
 
     public GameView(Context context, int screenSizeX, int screenSizeY) {
         super(context);
@@ -64,6 +69,7 @@ public class GameView extends SurfaceView implements Runnable {
             mStars.add(new Star(getContext(), mScreenSizeX, mScreenSizeY, true));
         }
         mIsGameOver = false;
+        mNewHighScore = false;
     }
 
     @Override
@@ -90,8 +96,9 @@ public class GameView extends SurfaceView implements Runnable {
             if (Rect.intersects(m.getCollision(), mPlayer.getCollision())) {
                 m.destroy();
                 mIsGameOver = true;
-                if (SCORE>=mSP.getHighScore()){
-                    mSP.saveHighScore(SCORE);
+                if (SCORE>mSP.getHighScore()){
+                    mNewHighScore = true;
+                    mSP.saveHighScore(SCORE, METEOR_DESTROYED, ENEMY_DESTROYED);
                 }
             }
 
@@ -125,7 +132,7 @@ public class GameView extends SurfaceView implements Runnable {
                 e.destroy();
                 mIsGameOver = true;
                 if (SCORE>=mSP.getHighScore()){
-                    mSP.saveHighScore(SCORE);
+                    mSP.saveHighScore(SCORE, METEOR_DESTROYED, ENEMY_DESTROYED);
                 }
             }
 
@@ -221,7 +228,20 @@ public class GameView extends SurfaceView implements Runnable {
         highScore.setTextSize(50);
         highScore.setTextAlign(Paint.Align.CENTER);
         highScore.setColor(Color.WHITE);
-        mCanvas.drawText("HighScore : " + mSP.getHighScore(), mScreenSizeX / 2, (mScreenSizeY / 2) + 60, highScore);
+        if (mNewHighScore){
+            mCanvas.drawText("New High Score : " + mSP.getHighScore(), mScreenSizeX / 2, (mScreenSizeY / 2) + 60, highScore);
+            Paint enemyDestroyed = new Paint();
+            enemyDestroyed.setTextSize(50);
+            enemyDestroyed.setTextAlign(Paint.Align.CENTER);
+            enemyDestroyed.setColor(Color.WHITE);
+            mCanvas.drawText("Enemy Destroyed : " + mSP.getEnemyDestroyed(), mScreenSizeX / 2, (mScreenSizeY / 2) + 120, enemyDestroyed);
+            Paint meteorDestroyed = new Paint();
+            meteorDestroyed.setTextSize(50);
+            meteorDestroyed.setTextAlign(Paint.Align.CENTER);
+            meteorDestroyed.setColor(Color.WHITE);
+            mCanvas.drawText("Meteor Destroyed : " + mSP.getMeteorDestroyed(), mScreenSizeX / 2, (mScreenSizeY / 2) + 180, meteorDestroyed);
+        }
+
     }
 
     public void steerLeft(float speed) {
@@ -271,7 +291,8 @@ public class GameView extends SurfaceView implements Runnable {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (mIsGameOver){
-                    reset();
+                    ((Activity) getContext()).finish();
+                    getContext().startActivity(new Intent(getContext(), MainMenuActivity.class));
                 }
                 break;
         }

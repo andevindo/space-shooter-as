@@ -8,6 +8,7 @@ import android.graphics.Rect;
 
 import java.util.Random;
 
+import static com.andevindo.spaceshooter.GameView.METEOR_DESTROYED;
 import static com.andevindo.spaceshooter.GameView.SCORE;
 
 /**
@@ -73,6 +74,7 @@ public class Meteor {
     public void hit(){
         if (--mHP ==0){
             SCORE += 20;
+            METEOR_DESTROYED++;
             destroy();
         }else{
             mSoundPlayer.playExplode();
